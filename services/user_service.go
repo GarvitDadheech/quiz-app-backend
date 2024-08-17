@@ -31,20 +31,42 @@ func LoginUser(username, password string) (int, error) {
     return dbUser.ID, nil
 }
 
-func RegisterUser(username, password string) (int64, error) {
+func RegisterUser(username, password string) (int64, string, error) {
+    // Check if the username already exists
+    var existingUserId int64
+    var existingUserPassword string
+    err := db.QueryRow("SELECT id, password FROM users WHERE username = ?", username).Scan(&existingUserId, &existingUserPassword)
+    if err != nil && err != sql.ErrNoRows {
+        return 0, "", err
+    }
+
+    if existingUserId != 0 {
+        // Check if the password matches
+        if bcrypt.CompareHashAndPassword([]byte(existingUserPassword), []byte(password)) == nil {
+            // Username and password match, user already exists
+            return 0, "User already exists. Please login.", nil
+        } else {
+            // Username exists but password doesn't match
+            return 0, "Username already taken. Please choose a different username.", nil
+        }
+    }
+
+    // Proceed with registration
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
-        return 0, err
+        return 0, "", err
     }
 
     result, err := db.Exec("INSERT INTO users (username, password) VALUES (?, ?)", username, string(hashedPassword))
     if err != nil {
-        return 0, err
+        return 0, "", err
     }
 
     id, _ := result.LastInsertId()
-    return id, nil
+    return id, "", nil
 }
+
+
 
 func FetchQuizzes() ([]models.Quiz, error) {
     rows, err := db.Query("SELECT id, title, description FROM quizzes")

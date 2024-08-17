@@ -38,14 +38,25 @@ func Register(c *gin.Context) {
         return
     }
 
-    userId, err := services.RegisterUser(user.Username, user.Password)
+    userId, message, err := services.RegisterUser(user.Username, user.Password)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
 
+    if message != "" {
+        if message == "user already exists, kindly login" {
+            c.JSON(http.StatusConflict, gin.H{"error": message})
+        } else {
+            c.JSON(http.StatusConflict, gin.H{"error": message})
+        }
+        return
+    }
+
     c.JSON(http.StatusOK, gin.H{"message": "User registered successfully", "user_id": userId})
 }
+
+
 
 // GetQuizzes retrieves all quizzes
 func GetQuizzes(c *gin.Context) {
