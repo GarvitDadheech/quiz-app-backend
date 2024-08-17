@@ -60,5 +60,7 @@ func main() {
     r.POST("/submit-answer", controllers.SubmitAnswer)
     r.GET("/user-score/:userId", controllers.GetUserScore)
     r.GET("/user-cash/:userId", controllers.GetUserCash)
+    r.POST("/update-user-cash", controllers.UpdateUserCash)
+    r.GET("/leaderboard", controllers.GetLeaderboard)
     r.Run(":8080")
 }

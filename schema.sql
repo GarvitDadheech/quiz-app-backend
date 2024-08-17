@@ -2,6 +2,7 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL
+    cash DECIMAL(10, 2) NOT NULL DEFAULT 100000.00
 );
 
 CREATE TABLE quizzes (
@@ -32,10 +33,4 @@ CREATE TABLE user_scores (
     score INT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id)
-);
-
-CREATE TABLE user_cash (
-    user_id INT PRIMARY KEY,
-    cash_amount DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
 );

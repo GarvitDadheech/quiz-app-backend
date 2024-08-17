@@ -149,11 +149,43 @@ func FetchUserScore(userId string) ([]models.UserScore, error) {
     return scores, nil
 }
 
+func UpdateUserCash(userID int, cashAmount float64) error {
+    _, err := db.Exec("UPDATE users SET cash = ? WHERE id = ?", cashAmount, userID)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
 func FetchUserCash(userId string) (float64, error) {
     var cashAmount float64
-    err := db.QueryRow("SELECT cash_amount FROM user_cash WHERE user_id = ?", userId).Scan(&cashAmount)
+    err := db.QueryRow("SELECT cash FROM users WHERE id = ?", userId).Scan(&cashAmount)
     if err != nil {
         return 0, err
     }
     return cashAmount, nil
+}
+
+func GetLeaderboard() ([]map[string]interface{}, error) {
+    rows, err := db.Query("SELECT u.id, u.username, u.cash from users u ORDER BY u.cash DESC")
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var leaderboard []map[string]interface{}
+    for rows.Next() {
+        var userID int
+        var username string
+        var cash float64
+        if err := rows.Scan(&userID, &username, &cash); err != nil {
+            return nil, err
+        }
+        leaderboard = append(leaderboard, map[string]interface{}{
+            "user_id": userID,
+            "username": username,
+            "cash":    cash,
+        })
+    }
+    return leaderboard, nil
 }

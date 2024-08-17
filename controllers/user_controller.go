@@ -125,3 +125,32 @@ func GetUserCash(c *gin.Context) {
     }
     c.JSON(http.StatusOK, gin.H{"cash_amount": cashAmount})
 }
+
+func UpdateUserCash(c *gin.Context) {
+    var updateData struct {
+        UserID    int     `json:"user_id"`
+        CashAmount float64 `json:"cash_amount"`
+    }
+
+    if err := c.BindJSON(&updateData); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    err := services.UpdateUserCash(updateData.UserID, updateData.CashAmount)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "User cash updated successfully"})
+}
+
+func GetLeaderboard(c *gin.Context) {
+    leaderboard, err := services.GetLeaderboard()
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve leaderboard"})
+        return
+    }
+    c.JSON(http.StatusOK, leaderboard)
+}
