@@ -165,3 +165,15 @@ func GetLeaderboard(c *gin.Context) {
     }
     c.JSON(http.StatusOK, leaderboard)
 }
+
+func GetRecentQuiz(c *gin.Context) {
+    userID := c.Param("user_id")
+
+    recentQuizID, err := services.GetRecentQuizID(userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, recentQuizID)
+}

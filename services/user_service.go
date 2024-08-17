@@ -211,3 +211,15 @@ func GetLeaderboard() ([]map[string]interface{}, error) {
     }
     return leaderboard, nil
 }
+
+func GetRecentQuizID(userID string) (int, error) {
+    var recentQuizID int
+    err := db.QueryRow("SELECT recent_quiz_id FROM users WHERE id = ?", userID).Scan(&recentQuizID)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return 0, nil
+        }
+        return 0, err
+    }
+    return recentQuizID, nil
+}

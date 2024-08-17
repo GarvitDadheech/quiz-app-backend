@@ -62,5 +62,6 @@ func main() {
     r.GET("/user-cash/:userId", controllers.GetUserCash)
     r.POST("/update-user-cash", controllers.UpdateUserCash)
     r.GET("/leaderboard", controllers.GetLeaderboard)
+    r.GET("/recent-quiz/:user_id", controllers.GetRecentQuiz)
     r.Run(":8080")
 }

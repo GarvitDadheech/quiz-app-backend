@@ -34,3 +34,13 @@ CREATE TABLE user_scores (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id)
 );
+
+CREATE TABLE user_quizzes (
+    user_id INT,
+    quiz_id INT,
+    completed_at DATETIME,
+    PRIMARY KEY (user_id, quiz_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id)
+);
+
