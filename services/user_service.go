@@ -223,3 +223,11 @@ func GetRecentQuizID(userID string) (int, error) {
     }
     return recentQuizID, nil
 }
+
+func UpdateRecentQuiz(userID int, quizID int) error {
+    _, err := db.Exec("UPDATE users SET recent_quiz_id = ? WHERE id = ?", quizID, userID)
+    if err != nil {
+        return err
+    }
+    return nil
+}

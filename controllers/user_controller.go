@@ -177,3 +177,23 @@ func GetRecentQuiz(c *gin.Context) {
 
     c.JSON(http.StatusOK, recentQuizID)
 }
+
+func UpdateRecentQuiz(c *gin.Context) {
+    var updateData struct {
+        UserID int `json:"user_id"`
+        QuizID int `json:"quiz_id"`
+    }
+
+    if err := c.BindJSON(&updateData); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    err := services.UpdateRecentQuiz(updateData.UserID, updateData.QuizID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Recent quiz updated successfully"})
+}
