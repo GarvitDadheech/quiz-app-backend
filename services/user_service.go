@@ -248,32 +248,34 @@ func UpdateRecentQuiz(userID int, quizID int) error {
 }
 
 func DeleteUserById(userId int) error {
-    // Start a transaction
-    tx, err := db.Begin()
-    if err != nil {
-        return err
-    }
-    defer tx.Rollback()
-    _, err = tx.Exec("DELETE FROM user_scores WHERE user_id = ?", userId)
+    // Delete from user_badges table
+    _, err := db.Exec("DELETE FROM user_badges WHERE user_id = ?", userId)
     if err != nil {
         return err
     }
 
-    _, err = tx.Exec("DELETE FROM user_quizzes WHERE user_id = ?", userId)
-    if err != nil {
-        return err
-    }
-    _, err = tx.Exec("DELETE FROM users WHERE id = ?", userId)
+    // Delete from user_scores table
+    _, err = db.Exec("DELETE FROM user_scores WHERE user_id = ?", userId)
     if err != nil {
         return err
     }
 
-    if err := tx.Commit(); err != nil {
+    // Delete from user_quizzes table
+    _, err = db.Exec("DELETE FROM user_quizzes WHERE user_id = ?", userId)
+    if err != nil {
+        return err
+    }
+
+    // Delete from users table
+    _, err = db.Exec("DELETE FROM users WHERE id = ?", userId)
+    if err != nil {
         return err
     }
 
     return nil
 }
+
+
 
 type Badge struct {
     BadgeID     int    `json:"badge_id"`
