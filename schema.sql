@@ -44,3 +44,21 @@ CREATE TABLE user_quizzes (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id)
 );
 
+
+CREATE TABLE badges (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,      
+    description TEXT,                 
+);
+
+CREATE TABLE user_badges (
+    user_id INT,
+    badge_id INT,
+    earned BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (user_id, badge_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (badge_id) REFERENCES badges(id)
+);
+
+
+

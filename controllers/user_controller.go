@@ -7,6 +7,7 @@ import (
     "github.com/GarvitDadheech/quiz-app-backend/services"
     "github.com/GarvitDadheech/quiz-app-backend/models"
     "github.com/gin-gonic/gin"
+    "fmt"
 )
 
 // Login handles the login request
@@ -215,4 +216,71 @@ func DeleteUser(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
 
+func GetAllUserBadges(c *gin.Context) {
+    userID := c.Param("userId")
 
+    badges, err := services.FetchAllUserBadges(userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch badges"})
+        return
+    }
+    // Convert badges to a map with badge names as keys
+    badgeMap := make(map[string]map[string]interface{})
+    for _, badge := range badges {
+        badgeMap[badge.Name] = map[string]interface{}{
+            "description": badge.Description,
+            "earned":      badge.Earned,
+        }
+    }
+
+    c.JSON(http.StatusOK, badgeMap)
+}
+
+func GetUsernameHandler(c *gin.Context) {
+    userID := c.Param("userId")
+    
+    username, err := services.GetUsernameByID(userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+        return
+    }
+    
+    if username == "" {
+        c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"username": username})
+}
+
+func UpdateUserBadges(c *gin.Context) {
+    var requestBody struct {
+        UserID    int   `json:"user_id"`
+        BadgeIDs  []int `json:"badge_ids"`
+    }
+
+    // Attempt to bind the request body
+    if err := c.BindJSON(&requestBody); err != nil {
+        // Log the error
+        fmt.Printf("Failed to bind JSON: %v\n", err)
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+        return
+    }
+
+    userID := requestBody.UserID
+    badgeIDs := requestBody.BadgeIDs
+
+    // Log the received data
+    fmt.Printf("Received request - UserID: %d, BadgeIDs: %v\n", userID, badgeIDs)
+
+    // Attempt to update badges
+    err := services.UpdateBadges(userID, badgeIDs)
+    if err != nil {
+        // Log the error
+        fmt.Printf("Failed to update badges: %v\n", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update badges"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Badges updated successfully"})
+}

@@ -4,6 +4,7 @@ import (
     "database/sql"
     "github.com/GarvitDadheech/quiz-app-backend/models"
     "golang.org/x/crypto/bcrypt"
+    "fmt"
 )
 
 var db *sql.DB
@@ -62,7 +63,21 @@ func RegisterUser(username, password string) (int64, string, error) {
         return 0, "", err
     }
 
-    id, _ := result.LastInsertId()
+    id, err := result.LastInsertId()
+    if err != nil {
+        return 0, "", err
+    }
+
+    
+    _, err = db.Exec(`
+        INSERT INTO user_badges (user_id, badge_id, earned)
+        SELECT ?, b.id, FALSE
+        FROM badges b
+    `, id)
+    if err != nil {
+        return 0, "", err
+    }
+
     return id, "", nil
 }
 
@@ -260,4 +275,64 @@ func DeleteUserById(userId int) error {
     return nil
 }
 
+type Badge struct {
+    BadgeID     int    `json:"badge_id"`
+    Name        string `json:"name"`
+    Description string `json:"description"`
+    Earned      bool   `json:"earned"`
+}
 
+// FetchAllUserBadges retrieves all badges for a given user
+func FetchAllUserBadges(userID string) ([]Badge, error) {
+    var badges []Badge
+
+    query := `
+        SELECT b.id AS badge_id, b.name, b.description, COALESCE(ub.earned, FALSE) AS earned
+        FROM badges b
+        LEFT JOIN user_badges ub ON b.id = ub.badge_id AND ub.user_id = ?
+    `
+    
+    rows, err := db.Query(query, userID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        var badge Badge
+        if err := rows.Scan(&badge.BadgeID, &badge.Name, &badge.Description, &badge.Earned); err != nil {
+            return nil, err
+        }
+        badges = append(badges, badge)
+    }
+
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
+
+    return badges, nil
+}
+
+func GetUsernameByID(userID string) (string, error) {
+    var username string
+    err := db.QueryRow("SELECT username FROM users WHERE id = ?", userID).Scan(&username)
+    if err == sql.ErrNoRows {
+        return "", nil
+    } else if err != nil {
+        return "", err
+    }
+    return username, nil
+}
+
+func UpdateBadges(userID int, badgeIDs []int) error {
+    // Iterate over badgeIDs and perform the update for each
+    for _, badgeID := range badgeIDs {
+        query := "UPDATE user_badges SET earned = TRUE WHERE user_id = ? AND badge_id = ?"
+        _, err := db.Exec(query, userID, badgeID)
+        if err != nil {
+            return fmt.Errorf("could not execute statement for badge ID %d: %w", badgeID, err)
+        }
+    }
+    
+    return nil
+}

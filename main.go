@@ -65,5 +65,8 @@ func main() {
     r.GET("/recent-quiz/:user_id", controllers.GetRecentQuiz)
     r.PUT("/update-recent-quiz", controllers.UpdateRecentQuiz)
     r.DELETE("/delete-user/:userId", controllers.DeleteUser)
+    r.GET("/user/:userId/badges", controllers.GetAllUserBadges)
+    r.GET("/user/:userId/username", controllers.GetUsernameHandler)
+    r.POST("/update-user-badges", controllers.UpdateUserBadges)
     r.Run(":8080")
 }
