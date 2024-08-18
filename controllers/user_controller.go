@@ -1,7 +1,7 @@
 package controllers
 
 import (
-    "database/sql" // Add this import
+    "database/sql"
     "net/http"
     "strconv"
     "github.com/GarvitDadheech/quiz-app-backend/services"
@@ -59,7 +59,7 @@ func Register(c *gin.Context) {
 
 
 
-// GetQuizzes retrieves all quizzes
+
 func GetQuizzes(c *gin.Context) {
     quizzes, err := services.FetchQuizzes()
     if err != nil {
@@ -70,7 +70,6 @@ func GetQuizzes(c *gin.Context) {
     c.JSON(http.StatusOK, quizzes)
 }
 
-// GetQuiz retrieves a specific quiz by its ID
 func GetQuiz(c *gin.Context) {
     id := c.Param("id")
     quiz, err := services.FetchQuiz(id)
@@ -86,7 +85,7 @@ func GetQuiz(c *gin.Context) {
     c.JSON(http.StatusOK, quiz)
 }
 
-// SubmitAnswer handles answer submissions
+
 func SubmitAnswer(c *gin.Context) {
     var submission struct {
         UserId     int `json:"user_id"`
@@ -109,7 +108,7 @@ func SubmitAnswer(c *gin.Context) {
     c.JSON(http.StatusOK, result)
 }
 
-// GetUserScore retrieves the score of a user
+
 func GetUserScore(c *gin.Context) {
     userId := c.Param("userId")
     scores, err := services.FetchUserScore(userId)
@@ -224,7 +223,7 @@ func GetAllUserBadges(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch badges"})
         return
     }
-    // Convert badges to a map with badge names as keys
+    
     badgeMap := make(map[string]map[string]interface{})
     for _, badge := range badges {
         badgeMap[badge.Name] = map[string]interface{}{
@@ -259,9 +258,9 @@ func UpdateUserBadges(c *gin.Context) {
         BadgeIDs  []int `json:"badge_ids"`
     }
 
-    // Attempt to bind the request body
+   
     if err := c.BindJSON(&requestBody); err != nil {
-        // Log the error
+      
         fmt.Printf("Failed to bind JSON: %v\n", err)
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
         return
@@ -270,13 +269,13 @@ func UpdateUserBadges(c *gin.Context) {
     userID := requestBody.UserID
     badgeIDs := requestBody.BadgeIDs
 
-    // Log the received data
+ 
     fmt.Printf("Received request - UserID: %d, BadgeIDs: %v\n", userID, badgeIDs)
 
-    // Attempt to update badges
+    
     err := services.UpdateBadges(userID, badgeIDs)
     if err != nil {
-        // Log the error
+       
         fmt.Printf("Failed to update badges: %v\n", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update badges"})
         return
@@ -297,7 +296,6 @@ func GetBadgeNames(c *gin.Context) {
     badgeIDs := requestBody.BadgeIDs
     badgeNames, err := services.FetchBadgeNames(badgeIDs)
     if err != nil {
-        // Log the error for debugging
         fmt.Printf("Failed to fetch badge names: %v\n", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch badge names"})
         return
