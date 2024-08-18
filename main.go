@@ -64,5 +64,6 @@ func main() {
     r.GET("/leaderboard", controllers.GetLeaderboard)
     r.GET("/recent-quiz/:user_id", controllers.GetRecentQuiz)
     r.PUT("/update-recent-quiz", controllers.UpdateRecentQuiz)
+    r.DELETE("/delete-user/:userId", controllers.DeleteUser)
     r.Run(":8080")
 }

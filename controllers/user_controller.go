@@ -3,7 +3,7 @@ package controllers
 import (
     "database/sql" // Add this import
     "net/http"
-
+    "strconv"
     "github.com/GarvitDadheech/quiz-app-backend/services"
     "github.com/GarvitDadheech/quiz-app-backend/models"
     "github.com/gin-gonic/gin"
@@ -197,3 +197,22 @@ func UpdateRecentQuiz(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"message": "Recent quiz updated successfully"})
 }
+
+func DeleteUser(c *gin.Context) {
+    userIdStr := c.Param("userId")
+    userId, err := strconv.Atoi(userIdStr)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to convert userId"})
+        return
+    }
+
+    err = services.DeleteUserById(userId)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user", "details": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+}
+
+

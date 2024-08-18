@@ -231,3 +231,33 @@ func UpdateRecentQuiz(userID int, quizID int) error {
     }
     return nil
 }
+
+func DeleteUserById(userId int) error {
+    // Start a transaction
+    tx, err := db.Begin()
+    if err != nil {
+        return err
+    }
+    defer tx.Rollback()
+    _, err = tx.Exec("DELETE FROM user_scores WHERE user_id = ?", userId)
+    if err != nil {
+        return err
+    }
+
+    _, err = tx.Exec("DELETE FROM user_quizzes WHERE user_id = ?", userId)
+    if err != nil {
+        return err
+    }
+    _, err = tx.Exec("DELETE FROM users WHERE id = ?", userId)
+    if err != nil {
+        return err
+    }
+
+    if err := tx.Commit(); err != nil {
+        return err
+    }
+
+    return nil
+}
+
+
