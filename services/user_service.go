@@ -9,7 +9,6 @@ import (
 
 var db *sql.DB
 
-// Initialize the services with the database connection
 func Initialize(database *sql.DB) {
     db = database
 }
@@ -33,7 +32,7 @@ func LoginUser(username, password string) (int, error) {
 }
 
 func RegisterUser(username, password string) (int64, string, error) {
-    // Check if the username already exists
+
     var existingUserId int64
     var existingUserPassword string
     err := db.QueryRow("SELECT id, password FROM users WHERE username = ?", username).Scan(&existingUserId, &existingUserPassword)
@@ -284,7 +283,6 @@ type Badge struct {
     Earned      bool   `json:"earned"`
 }
 
-// FetchAllUserBadges retrieves all badges for a given user
 func FetchAllUserBadges(userID string) ([]Badge, error) {
     var badges []Badge
 
@@ -327,7 +325,7 @@ func GetUsernameByID(userID string) (string, error) {
 }
 
 func UpdateBadges(userID int, badgeIDs []int) error {
-    // Iterate over badgeIDs and perform the update for each
+    
     for _, badgeID := range badgeIDs {
         query := "UPDATE user_badges SET earned = TRUE WHERE user_id = ? AND badge_id = ?"
         _, err := db.Exec(query, userID, badgeID)
