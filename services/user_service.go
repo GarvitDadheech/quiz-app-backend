@@ -336,3 +336,22 @@ func UpdateBadges(userID int, badgeIDs []int) error {
     
     return nil
 }
+
+func FetchBadgeNames(badgeIDs []int) (map[int]string, error) {
+    badgeNames := make(map[int]string)
+
+    for _, badgeID := range badgeIDs {
+        query := "SELECT name FROM badges WHERE id = ?"
+        var badgeName string
+        err := db.QueryRow(query, badgeID).Scan(&badgeName)
+        if err != nil {
+            // Log the error for debugging
+            fmt.Printf("Error retrieving name for badge ID %d: %v\n", badgeID, err)
+            return nil, fmt.Errorf("could not retrieve name for badge ID %d: %w", badgeID, err)
+        }
+        badgeNames[badgeID] = badgeName
+    }
+
+    return badgeNames, nil
+}
+

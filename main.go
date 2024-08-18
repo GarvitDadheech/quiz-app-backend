@@ -68,5 +68,6 @@ func main() {
     r.GET("/user/:userId/badges", controllers.GetAllUserBadges)
     r.GET("/user/:userId/username", controllers.GetUsernameHandler)
     r.POST("/update-user-badges", controllers.UpdateUserBadges)
+    r.POST("/get-badge-names", controllers.GetBadgeNames)
     r.Run(":8080")
 }

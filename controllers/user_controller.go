@@ -284,3 +284,25 @@ func UpdateUserBadges(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"message": "Badges updated successfully"})
 }
+
+func GetBadgeNames(c *gin.Context) {
+    var requestBody struct {
+        BadgeIDs []int `json:"badge_ids"`
+    }
+    if err := c.BindJSON(&requestBody); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+        return
+    }
+
+    badgeIDs := requestBody.BadgeIDs
+    badgeNames, err := services.FetchBadgeNames(badgeIDs)
+    if err != nil {
+        // Log the error for debugging
+        fmt.Printf("Failed to fetch badge names: %v\n", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch badge names"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"badge_names": badgeNames})
+}
+
